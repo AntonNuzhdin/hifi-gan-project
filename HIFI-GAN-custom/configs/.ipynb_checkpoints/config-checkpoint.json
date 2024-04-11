@@ -1,0 +1,211 @@
+{
+    "name": "default_config",
+    "n_gpu": 2,
+    "arch": {
+        "type": "HiFiGAN",
+        "args": {
+            "generator_config": {
+                "in_channels": 80,
+                "hid_dim": 512,
+                "conv_trans_kernel_sizes": [
+                    16,
+                    16,
+                    4,
+                    4
+                ],
+                "mrf_kernel_sizes": [
+                    3,
+                    7,
+                    11
+                ],
+                "mrf_dilations": [
+                    [
+                        [
+                            1,
+                            1
+                        ],
+                        [
+                            3,
+                            1
+                        ],
+                        [
+                            5,
+                            1
+                        ]
+                    ],
+                    [
+                        [
+                            1,
+                            1
+                        ],
+                        [
+                            3,
+                            1
+                        ],
+                        [
+                            5,
+                            1
+                        ]
+                    ],
+                    [
+                        [
+                            1,
+                            1
+                        ],
+                        [
+                            3,
+                            1
+                        ],
+                        [
+                            5,
+                            1
+                        ]
+                    ]
+                ]
+            },
+            "mpd_config": {
+                "periods": [
+                    2,
+                    3,
+                    5,
+                    7,
+                    11
+                ],
+                "kernel_size": 5,
+                "stride": 3,
+                "channels": [
+                    32,
+                    128,
+                    512,
+                    1024
+                ]
+            },
+            "msd_config": {
+                "factors": [
+                    1,
+                    2,
+                    4
+                ],
+                "kernel_sizes": [
+                    15,
+                    41,
+                    41,
+                    41,
+                    41,
+                    41,
+                    5
+                ],
+                "strides": [
+                    1,
+                    2,
+                    2,
+                    4,
+                    4,
+                    1,
+                    1
+                ],
+                "groups": [
+                    1,
+                    4,
+                    16,
+                    16,
+                    16,
+                    16,
+                    1
+                ],
+                "channels": [
+                    128,
+                    128,
+                    256,
+                    512,
+                    1024,
+                    1024,
+                    1024
+                ]
+            }
+        }
+    },
+    "data": {
+        "train": {
+            "batch_size": 16,
+            "num_workers": 2,
+            "datasets": [
+                {
+                    "type": "LJSpeechDataset",
+                    "args": {
+                        "data_path": "LJSpeech-1.1/wavs",
+                        "split_path": "HIFI-GAN-custom/data/Split-LJSpeech-1.1/training.txt",
+                        "wav_max_len": 8192
+                    }
+                }
+            ]
+        },
+        "val": {
+            "batch_size": 1,
+            "num_workers": 2,
+            "datasets": [
+                {
+                    "type": "LJSpeechDataset",
+                    "args": {
+                        "data_path": "LJSpeech-1.1/wavs",
+                        "split_path": "HIFI-GAN-custom/data/Split-LJSpeech-1.1/validation.txt",
+                        "wav_max_len": 22272
+                    }
+                }
+            ]
+        }
+    },
+    "optimizer_d": {
+        "type": "AdamW",
+        "args": {
+            "lr": 2e-4,
+            "betas": [
+                0.8,
+                0.99
+            ],
+            "weight_decay": 0.01
+        }
+    },
+    "optimizer_g": {
+        "type": "AdamW",
+        "args": {
+            "lr": 2e-4,
+            "betas": [
+                0.8,
+                0.99
+            ],
+            "weight_decay": 0.01
+        }
+    },
+    "lr_scheduler_d": {
+        "type": "ExponentialLR",
+        "args": {
+            "gamma": 0.9
+        }
+    },
+    "lr_scheduler_g": {
+        "type": "ExponentialLR",
+        "args": {
+            "gamma": 0.9
+        }
+    },
+    "loss": {
+        "type": "HiFiGANLoss",
+        "args": {
+            "mel_spectrogram_multiplier": 45,
+            "feature_matching_multiplier": 2
+        }
+    },
+    "metrics": [],
+    "trainer": {
+        "epochs": 3100,
+        "save_dir": "saved/",
+        "save_period": 10,
+        "verbosity": 2,
+        "monitor": "min val_loss",
+        "early_stop": 100,
+        "visualize": "wandb",
+        "wandb_project": "HIFI-GAN",
+        "grad_norm_clip": 10
+    }
+}
